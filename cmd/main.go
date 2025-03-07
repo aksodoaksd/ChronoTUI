@@ -68,9 +68,6 @@ func main() {
 	defStyle := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
 	boxStyle := tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorPurple)
 
-	currentTime := time.Now()
-	fmt.Println("Short Hour Minute Second: ", currentTime.Format("3:4:5 pm"))
-
 	// Initialize screen
 	s, err := tcell.NewScreen()
 	if err != nil {
@@ -86,11 +83,13 @@ func main() {
 	s.EnablePaste()
 	s.Clear()
 
-	// Draw initial boxes
-	drawBox(s, 1, 1, 42, 7, boxStyle, "Click and drag to draw a box")
-	drawBox(s, 5, 9, 32, 14, boxStyle, fmt.Sprint(currentTime.Format("3:4:5 pm")))
+	xmax, ymax := s.Size()
+	middleX, middleY := xmax/2, ymax/2
 
-	drawText(s, 0, 0, 20, 20, boxStyle, "Chupapi")
+	currentTime := time.Now()
+	text := fmt.Sprint(currentTime.Format("3:4:5 pm"))
+
+	drawText(s, middleX-(len(text)/2), middleY, middleX+10, middleY+2, boxStyle, text)
 
 	quit := func() {
 		// You have to catch panics in a defer, clean up, and
@@ -114,7 +113,6 @@ func main() {
 	// s.PostEvent(tcell.NewEventKey(tcell.KeyRune, rune('a'), 0))
 
 	// Event loop
-	ox, oy := -1, -1
 	for {
 		// Update screen
 		s.Show()
@@ -133,22 +131,6 @@ func main() {
 				s.Sync()
 			} else if ev.Rune() == 'C' || ev.Rune() == 'c' {
 				s.Clear()
-			}
-		case *tcell.EventMouse:
-			x, y := ev.Position()
-
-			switch ev.Buttons() {
-			case tcell.Button1, tcell.Button2:
-				if ox < 0 {
-					ox, oy = x, y // record location when click started
-				}
-
-			case tcell.ButtonNone:
-				if ox >= 0 {
-					label := fmt.Sprintf("%d,%d to %d,%d", ox, oy, x, y)
-					drawBox(s, ox, oy, x, y, boxStyle, label)
-					ox, oy = -1, -1
-				}
 			}
 		}
 	}
