@@ -79,17 +79,24 @@ func main() {
 		os.Exit(1)
 	}
 	s.SetStyle(defStyle)
-	s.EnableMouse()
-	s.EnablePaste()
 	s.Clear()
 
 	xmax, ymax := s.Size()
 	middleX, middleY := xmax/2, ymax/2
 
-	currentTime := time.Now()
-	text := fmt.Sprint(currentTime.Format("3:4:5 pm"))
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
 
-	drawText(s, middleX-(len(text)/2), middleY, middleX+10, middleY+2, boxStyle, text)
+			currentTime := time.Now().Format("3:04:05 PM")
+
+			s.Clear()
+			xmax, ymax := s.Size()
+			drawText(s, middleX-len(currentTime)/2, middleY, xmax/2+10, ymax/2+2, boxStyle, currentTime)
+
+			s.Show()
+		}
+	}()
 
 	quit := func() {
 		// You have to catch panics in a defer, clean up, and
