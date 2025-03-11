@@ -44,6 +44,8 @@ func main() {
 	xmax, ymax := s.Size()
 	middleX, middleY := xmax/2, ymax/2
 
+	tip := "Press CTRL+C to quit..."
+
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
@@ -51,7 +53,9 @@ func main() {
 			currentTime := time.Now().Format("3:04:05 PM")
 
 			s.Clear()
+			s.Sync()
 			xmax, ymax := s.Size()
+			drawText(s, xmax-len(tip), ymax-1, xmax, ymax, tcell.StyleDefault.Foreground(tcell.ColorDarkGray).Background(tcell.ColorReset), tip)
 			drawText(s, middleX-len(currentTime)/2, middleY, xmax/2+10, ymax/2+2, boxStyle, currentTime)
 
 			s.Show()
